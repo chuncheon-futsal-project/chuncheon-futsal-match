@@ -9,27 +9,9 @@
     <h1>춘모아 ⚽</h1>
     <p>춘천 풋살 경기 모집 서비스</p>
 
-    <button onclick="getHello()">백엔드 연결 테스트</button>
-
+    <button id="helloButton">백엔드 연결 테스트</button>
     <p id="result"></p>
 
-    <script>
-        async function getHello() {
-            try {
-                const response = await fetch('http://localhost:8080/api/hello');
-
-                if (!response.ok) {
-                    throw new Error(`HTTP 오류: ${response.status}`);
-                }
-
-                const data = await response.text();
-
-                document.getElementById('result').textContent = data;
-            } catch (error) {
-                console.error(error);
-                document.getElementById('result').textContent = '서버 연결 실패';
-            }
-        }
-    </script>
+    <script type="module" src="/src/main.js"></script>
 </body>
 </html>
