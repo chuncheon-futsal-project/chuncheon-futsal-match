@@ -1,0 +1,80 @@
+
+Project chunmoa {
+  database_type: 'MySQL'
+  Note: '춘모아 풋살 경기 모집 서비스'
+}
+
+// 1. 회원
+Table users {
+  id bigint [pk]
+  email varchar(255) [unique, not null]
+  password_hash varchar(255) [not null]
+  nickname varchar(50) [unique, not null]
+  skill_level varchar(30)
+  play_style varchar(30)
+  bio varchar(255)
+
+  Note: '첫 경기 개설 또는 참가 신청 시 실력 수준과 플레이스타일 필수'
+}
+
+// 2. 경기
+Table matches {
+  id bigint [pk]
+  organizer_id bigint [not null]
+  match_date date [not null]
+  start_time time [not null]
+  duration_minutes int [not null]
+  venue_name varchar(255) [not null]
+  venue_address varchar(255) [not null]
+  venue_latitude decimal(11,7) [not null]
+  venue_longitude decimal(11,7) [not null]
+  capacity int [not null]
+  friend_count int [not null]
+  venue_total_fee int [not null]
+  additional_description text
+  venue_booking_status varchar(30) [not null]
+  kakao_open_chat_url varchar(2048) [not null]
+  is_canceled boolean [not null]
+  is_manually_closed boolean [not null]
+
+  Note: '전체 정원 >= 모집자 1명 + 기존 친구 인원 + 확정 참가자 수'
+}
+
+// 3. 참가
+Table participation {
+  id bigint [pk]
+  user_id bigint [not null]
+  match_id bigint [not null]
+  participation_status varchar(20) [not null, note: 'CONFIRMED, CANCELED']
+
+  indexes {
+    (user_id, match_id) [unique]
+  }
+
+  Note: '모집자는 참가 테이블에 저장하지 않음. 참가 취소 후 재신청 정책은 추후 결정.'
+}
+
+// 4. 경기 키워드
+Table match_keyword {
+  match_id bigint [not null]
+  keyword_id bigint [not null]
+
+  indexes {
+    (match_id, keyword_id) [pk]
+  }
+
+  Note: '경기마다 키워드 최소 1개 필수. 복합 PK만으로 보장되지 않음.'
+}
+
+// 5. 키워드
+Table keyword {
+  id bigint [pk]
+  name varchar(100) [unique, not null]
+}
+
+// 엔티티 간 관계 (FK)
+Ref: matches.organizer_id > users.id
+Ref: participation.user_id > users.id
+Ref: participation.match_id > matches.id
+Ref: match_keyword.match_id > matches.id
+Ref: match_keyword.keyword_id > keyword.id
